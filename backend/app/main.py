@@ -12,8 +12,14 @@ df: pd.DataFrame = None
 
 def load_data():
     global df
-    path = settings.DATA_PATH
-    if os.path.exists(path):
+    candidates = [
+        settings.DATA_PATH,
+        os.path.join(os.getcwd(), "datasets", "processed", "accidents_clean.csv"),
+        os.path.join(os.path.dirname(__file__), "..", "..", "datasets", "processed", "accidents_clean.csv"),
+        "datasets/processed/accidents_clean.csv",
+    ]
+    path = next((p for p in candidates if os.path.exists(p)), None)
+    if path:
         df = pd.read_csv(path, low_memory=False)
         # Ensure numeric types
         for col in ["Start_Lat", "Start_Lng", "Severity", "Hour", "Month", "Year"]:
@@ -22,7 +28,7 @@ def load_data():
         df.dropna(subset=["Start_Lat", "Start_Lng"], inplace=True)
         print(f"[DATA] Loaded {len(df):,} records from {path}")
     else:
-        print(f"[DATA] WARNING: {path} not found. Using empty dataframe.")
+        print("[DATA] WARNING: accidents_clean.csv not found in candidate paths. Using empty dataframe.")
         df = pd.DataFrame()
 
 
