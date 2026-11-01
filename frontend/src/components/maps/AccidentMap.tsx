@@ -139,14 +139,14 @@ export default function AccidentMap({
       >
         <MapFlyController target={flyToTarget} />
 
-        {/* Dynamic Vector Basemap */}
+        {/* Dynamic Vector Basemap - 100% OpenStreetMap (Zero watermark, no API key required) */}
         {showBaseMap && (
           <TileLayer
             key={baseMapStyle}
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-            url={tileUrls[baseMapStyle]}
-            subdomains={['a', 'b', 'c', 'd']}
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             maxZoom={19}
+            className={baseMapStyle === 'dark' ? 'dark-map-tiles' : ''}
           />
         )}
 
