@@ -12,6 +12,7 @@ def _get_df() -> pd.DataFrame:
 
 
 @router.get("")
+@router.get("/")
 def get_hotspots(
     risk_level: Optional[str] = Query(default=None),
     city: Optional[str] = Query(default=None),

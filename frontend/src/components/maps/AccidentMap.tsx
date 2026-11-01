@@ -142,10 +142,11 @@ export default function AccidentMap({
         {/* Dynamic Vector Basemap */}
         {showBaseMap && (
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            key={baseMapStyle}
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+            url={tileUrls[baseMapStyle]}
+            subdomains={['a', 'b', 'c', 'd']}
             maxZoom={19}
-            className={baseMapStyle === 'dark' ? 'dark-map-tiles' : ''}
           />
         )}
 

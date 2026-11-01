@@ -36,33 +36,41 @@ export default function HeatmapLayer({
     let heatLayer: any = null
     let isCancelled = false
 
-    // Dynamically import leaflet.heat after window.L is firmly attached
-    import('leaflet.heat')
-      .then(() => {
-        if (isCancelled || !map) return
-        const heatData = points.map(p => [p.lat, p.lng, p.intensity] as [number, number, number])
+    const createHeatLayer = () => {
+      if (isCancelled || !map) return
+      const heatData = points.map(p => [p.lat, p.lng, p.intensity] as [number, number, number])
 
-        if (typeof (L as any).heatLayer === 'function') {
-          heatLayer = (L as any).heatLayer(heatData, {
-            radius,
-            blur,
-            maxZoom,
-            max,
-            minOpacity: 0.35,
-            gradient: {
-              0.15: '#00e5ff', // Cyan
-              0.35: '#2563eb', // Electric Blue
-              0.55: '#facc15', // Amber Yellow
-              0.75: '#fb923c', // Terracotta Orange
-              1.00: '#dc2626', // Deep Red Core
-            },
-          })
-          heatLayer.addTo(map)
-        }
-      })
-      .catch(err => {
-        console.warn('Leaflet.heat module failed to load:', err)
-      })
+      if (typeof (L as any).heatLayer === 'function') {
+        heatLayer = (L as any).heatLayer(heatData, {
+          radius,
+          blur,
+          maxZoom,
+          max,
+          minOpacity: 0.35,
+          gradient: {
+            0.15: '#00e5ff', // Cyan
+            0.35: '#2563eb', // Electric Blue
+            0.55: '#facc15', // Amber Yellow
+            0.75: '#fb923c', // Terracotta Orange
+            1.00: '#dc2626', // Deep Red Core
+          },
+        })
+        heatLayer.addTo(map)
+      }
+    }
+
+    if (typeof (L as any).heatLayer === 'function') {
+      createHeatLayer()
+    } else {
+      // Dynamically import leaflet.heat after window.L is firmly attached
+      import('leaflet.heat')
+        .then(() => {
+          createHeatLayer()
+        })
+        .catch(err => {
+          console.warn('Leaflet.heat module failed to load:', err)
+        })
+    }
 
     return () => {
       isCancelled = true
