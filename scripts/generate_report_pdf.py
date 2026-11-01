@@ -238,6 +238,7 @@ def generate_pdf(output_pdf):
     story.append(Paragraph("The following screenshots demonstrate the deployed, production full-stack analytics platform running on Vercel cloud infrastructure:", body_justify))
     story.append(Spacer(1, 3))
 
+    # Figure 1: GIS Map
     img_gis = "/Users/likhithmr/.gemini/antigravity/brain/47ddebf7-3c4b-4514-a371-cc9563ce61f0/gis_clean_verified.png"
     if os.path.exists(img_gis):
         story.append(Paragraph("<b>Figure 1:</b> Geospatial Black Spot Identification & Risk Heatmap (Houston Metropolitan Area)", sub_title))
@@ -246,12 +247,13 @@ def generate_pdf(output_pdf):
         story.append(Paragraph("<i>Discussion: Over 2,485 discrete accident clusters were mapped. The highest-risk corridor (469 Broadway, Houston — 83 total collisions, 9 severe, Risk Score: 110) exhibits high-intensity red thermal gradients, validating targeted police deployment needs.</i>", callout_style))
     story.append(Spacer(1, 4))
 
-    img_dark = "/Users/likhithmr/.gemini/antigravity/brain/47ddebf7-3c4b-4514-a371-cc9563ce61f0/gis_dark_matter_verified.png"
-    if os.path.exists(img_dark):
-        story.append(Paragraph("<b>Figure 2:</b> High-Contrast Night-Mode GIS Command Center with Hazard Telemetry", sub_title))
-        story.append(Image(img_dark, width=6.5*inch, height=2.3*inch))
+    # Figure 2: Hadoop Operations Console
+    img_hadoop = "/Users/likhithmr/.gemini/antigravity/brain/47ddebf7-3c4b-4514-a371-cc9563ce61f0/shot_rendered.png"
+    if os.path.exists(img_hadoop):
+        story.append(Paragraph("<b>Figure 2:</b> Hadoop Ecosystem Execution Console (Big Data Processing & Apache Pig ETL Runner)", sub_title))
+        story.append(Image(img_hadoop, width=6.5*inch, height=2.3*inch))
         story.append(Spacer(1, 2))
-        story.append(Paragraph("<i>Discussion: Designed for 24/7 traffic control command rooms, the dark mode reduces monitor glare. The right-hand telemetry sidebar summarizes top hazardous intersections, primary road surface defects, and seasonal accident variations in real time.</i>", callout_style))
+        story.append(Paragraph("<i>Discussion: The Hadoop Operations dashboard enables interactive execution and monitoring of distributed Pig Latin dataflow scripts (Clean Accidents ETL), MapReduce batch jobs, Hive queries, and PySpark analytics across cluster worker nodes.</i>", callout_style))
 
     story.append(Spacer(1, 3))
     story.append(Paragraph("03", pnum_style))
