@@ -6,41 +6,19 @@ from reportlab.platypus import (
     SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image, PageBreak, KeepTogether, HRFlowable
 )
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.pdfgen import canvas
 
 LOGO_IMG = "/tmp/college_logo.png"
 
-class BorderCanvas(canvas.Canvas):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._saved_page_states = []
-
-    def showPage(self):
-        self._saved_page_states.append(dict(self.__dict__))
-        self._startPage()
-
-    def save(self):
-        num_pages = len(self._saved_page_states)
-        for state in self._saved_page_states:
-            self.__dict__.update(state)
-            self.draw_border()
-            super().showPage()
-        super().save()
-
-    def draw_border(self):
-        self.saveState()
-        # Clean white background guaranteed
-        self.setFillColor(colors.white)
-        self.rect(0, 0, letter[0], letter[1], fill=1, stroke=0)
-
-        # Elegant crisp institutional double border (standard VTU / academic project report format)
-        self.setStrokeColor(colors.HexColor('#1E293B')) # Dark Navy / Charcoal
-        self.setLineWidth(1.5)
-        self.rect(20, 20, letter[0] - 40, letter[1] - 40, fill=0, stroke=1)
-        
-        self.setLineWidth(0.6)
-        self.rect(23, 23, letter[0] - 46, letter[1] - 46, fill=0, stroke=1)
-        self.restoreState()
+def draw_page_decorations(canvas, doc):
+    canvas.saveState()
+    # Crisp, institutional double vector border (runs BEFORE flowables, so text is 100% on top!)
+    canvas.setStrokeColor(colors.HexColor('#1E293B')) # Dark Charcoal / Navy
+    canvas.setLineWidth(1.5)
+    canvas.rect(20, 20, letter[0] - 40, letter[1] - 40, fill=0, stroke=1)
+    
+    canvas.setLineWidth(0.6)
+    canvas.rect(23, 23, letter[0] - 46, letter[1] - 46, fill=0, stroke=1)
+    canvas.restoreState()
 
 def generate_pdf(output_pdf):
     doc = SimpleDocTemplate(
@@ -55,7 +33,6 @@ def generate_pdf(output_pdf):
     styles = getSampleStyleSheet()
 
     # Base typography matching Times-Roman in VTU / VVCE template
-    t_center_bold_20 = ParagraphStyle('T20', fontName='Times-Bold', fontSize=18, leading=22, alignment=1, textColor=colors.black)
     t_center_bold_16 = ParagraphStyle('T16', fontName='Times-Bold', fontSize=15, leading=19, alignment=1, textColor=colors.black)
     t_center_bold_14 = ParagraphStyle('T14', fontName='Times-Bold', fontSize=13, leading=17, alignment=1, textColor=colors.black)
     t_center_bold_12 = ParagraphStyle('T12', fontName='Times-Bold', fontSize=11, leading=15, alignment=1, textColor=colors.black)
@@ -418,7 +395,8 @@ def generate_pdf(output_pdf):
     story.append(Spacer(1, 3))
     story.append(Paragraph("8", pnum_style))
 
-    doc.build(story, canvasmaker=BorderCanvas)
+    # NOTE: Using onFirstPage and onLaterPages callback to ensure borders are drawn UNDER the text!
+    doc.build(story, onFirstPage=draw_page_decorations, onLaterPages=draw_page_decorations)
     print(f"Exact Report PDF built successfully: {output_pdf}")
 
 if __name__ == '__main__':
