@@ -3,6 +3,7 @@
 # 🚦 Road Accident Pattern Analysis and Black Spot Identification Using Hadoop
 ### Distributed Big Data Engineering · Geospatial Hotspot Identification · Full-Stack React & FastAPI Platform
 
+[![Vercel Deployment](https://img.shields.io/badge/Live_Demo-bda--accident--analytics.vercel.app-000000?logo=vercel&style=for-the-badge)](https://bda-accident-analytics.vercel.app)
 [![GitHub Repository](https://img.shields.io/badge/GitHub-Taiyorath%2FBDA--activity--green?logo=github&style=for-the-badge)](https://github.com/Taiyorath/BDA-activity-)
 [![Hadoop](https://img.shields.io/badge/Apache_Hadoop-3.3.6-FFCC00?logo=apachehadoop&logoColor=black&style=for-the-badge)](https://hadoop.apache.org/)
 [![Spark](https://img.shields.io/badge/Apache_Spark-3.5.1-E25A1C?logo=apachespark&logoColor=white&style=for-the-badge)](https://spark.apache.org/)
