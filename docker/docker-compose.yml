@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  # Hadoop NameNode
+  namenode:
+    image: apache/hadoop:3
+    hostname: namenode
+    container_name: namenode
+    environment:
+      - HADOOP_HOME=/opt/hadoop
+    ports:
+      - "9870:9870"   # HDFS NameNode Web UI
+      - "8020:8020"   # HDFS IPC
+    volumes:
+      - hadoop_namenode:/tmp/hadoop-root/dfs/name
+      - ../datasets:/datasets
+    command: ["hdfs", "namenode"]
+    networks:
+      - hadoop-net
+
+  datanode:
+    image: apache/hadoop:3
+    hostname: datanode
+    container_name: datanode
+    depends_on:
+      - namenode
+    ports:
+      - "9864:9864"
+    volumes:
+      - hadoop_datanode:/tmp/hadoop-root/dfs/data
+    command: ["hdfs", "datanode"]
+    networks:
+      - hadoop-net
+
+  resourcemanager:
+    image: apache/hadoop:3
+    hostname: resourcemanager
+    container_name: resourcemanager
+    ports:
+      - "8088:8088"   # YARN Web UI
+    command: ["yarn", "resourcemanager"]
+    networks:
+      - hadoop-net
+
+  # Backend API
+  backend:
+    build:
+      context: ../backend
+      dockerfile: ../docker/backend/Dockerfile
+    container_name: accident-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../datasets:/app/datasets
+      - ../hadoop:/app/hadoop
+    environment:
+      - DATA_PATH=/app/datasets/processed/accidents_clean.csv
+    networks:
+      - hadoop-net
+    depends_on:
+      - namenode
+
+  # Frontend
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: ../docker/frontend/Dockerfile
+    container_name: accident-frontend
+    ports:
+      - "4033:80"   # Frontend
+    depends_on:
+      - backend
+    networks:
+      - hadoop-net
+
+volumes:
+  hadoop_namenode:
+  hadoop_datanode:
+
+networks:
+  hadoop-net:
+    driver: bridge

@@ -1,0 +1,140 @@
+@import "tailwindcss";
+
+/* Enable class-based dark mode for Tailwind v4 */
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Claude's Iconic Terracotta / Warm Coral Palette */
+  --color-brand-50: #FAF4EE;
+  --color-brand-100: #F4E4D7;
+  --color-brand-200: #E8C8B3;
+  --color-brand-300: #DCAB8F;
+  --color-brand-400: #D08E6B;
+  --color-brand-500: #D97757;
+  --color-brand-600: #C26343;
+  --color-brand-700: #A84E32;
+  --color-brand-800: #883B23;
+  --color-brand-900: #6B2C18;
+  --color-brand-950: #3D160B;
+
+  /* Claude Earthy Risk Levels */
+  --color-risk-low: #4E8752;
+  --color-risk-moderate: #D48B38;
+  --color-risk-high: #C95742;
+  --color-risk-critical: #8B5E83;
+
+  /* Fonts */
+  --font-serif: 'Newsreader', Georgia, Cambria, 'Times New Roman', serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Claude Surfaces & Canvas */
+  --color-claude-bg-light: #FBF9F5;
+  --color-claude-bg-dark: #181715;
+  --color-claude-sidebar-light: #F3EFEA;
+  --color-claude-sidebar-dark: #1D1C19;
+  --color-claude-card-light: #FFFFFF;
+  --color-claude-card-dark: #252421;
+  --color-claude-border-light: #EAE5DD;
+  --color-claude-border-dark: #383530;
+  --color-claude-hover-light: #ECE7DF;
+  --color-claude-hover-dark: #2E2D28;
+  --color-claude-text-light: #262320;
+  --color-claude-text-dark: #EDE8E1;
+  --color-claude-muted-light: #6E685F;
+  --color-claude-muted-dark: #A8A297;
+
+  --sidebar-width: 250px;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-claude-bg-light);
+  color: var(--color-claude-text-light);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html.dark body {
+  background-color: var(--color-claude-bg-dark);
+  color: var(--color-claude-text-dark);
+}
+
+/* Serif utility */
+.font-editorial {
+  font-family: var(--font-serif);
+}
+
+/* Claude smooth scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #D9D3C7;
+  border-radius: 9999px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #3A3732;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #C4BCAD;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #4C4841;
+}
+
+/* Leaflet tile styling */
+.leaflet-container {
+  z-index: 1;
+  font-family: var(--font-sans) !important;
+}
+
+/* Sleek Obsidian Dark Map Vector Grid (no API key, zero watermark, matching mockup) */
+.dark-map-tiles {
+  filter: brightness(0.7) invert(1) contrast(1.25) hue-rotate(205deg) saturate(0.3) !important;
+}
+
+/* Leaflet Popup Styling - Claude Style */
+.leaflet-popup-content-wrapper {
+  background: #FFFFFF !important;
+  color: #262320 !important;
+  border: 1px solid #EAE5DD !important;
+  border-radius: 14px !important;
+  box-shadow: 0 10px 25px -5px rgba(38, 35, 32, 0.15) !important;
+  padding: 4px !important;
+}
+
+.dark .leaflet-popup-content-wrapper {
+  background: #252421 !important;
+  color: #EDE8E1 !important;
+  border: 1px solid #383530 !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
+}
+
+.leaflet-popup-tip {
+  background: #FFFFFF !important;
+  border: 1px solid #EAE5DD !important;
+}
+
+.dark .leaflet-popup-tip {
+  background: #252421 !important;
+  border: 1px solid #383530 !important;
+}
