@@ -14,7 +14,7 @@
       "entrypoint": "app.main:app",
       "functions": {
         "app/main.py": {
-          "includeFiles": "../datasets/processed/accidents_clean.csv",
+          "includeFiles": "datasets/processed/accidents_clean.csv",
           "maxDuration": 30
         }
       }

@@ -13,6 +13,7 @@ df: pd.DataFrame = None
 def load_data():
     global df
     candidates = [
+        os.path.join(os.path.dirname(__file__), "..", "datasets", "processed", "accidents_clean.csv"),
         settings.DATA_PATH,
         os.path.join(os.getcwd(), "datasets", "processed", "accidents_clean.csv"),
         os.path.join(os.path.dirname(__file__), "..", "..", "datasets", "processed", "accidents_clean.csv"),
