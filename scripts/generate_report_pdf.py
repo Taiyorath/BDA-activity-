@@ -1,5 +1,4 @@
 import os
-import fitz # PyMuPDF
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.lib.units import inch
@@ -9,7 +8,6 @@ from reportlab.platypus import (
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.pdfgen import canvas
 
-BORDER_IMG = "/tmp/page_border.png"
 LOGO_IMG = "/tmp/college_logo.png"
 
 class BorderCanvas(canvas.Canvas):
@@ -31,18 +29,25 @@ class BorderCanvas(canvas.Canvas):
 
     def draw_border(self):
         self.saveState()
-        # Draw border image matching exact coordinates from template PDF
-        # Rect(9.77, 6.90, 602.27, 785.40)
-        if os.path.exists(BORDER_IMG):
-            self.drawImage(BORDER_IMG, 9.77, 6.90, width=592.5, height=778.5, preserveAspectRatio=False)
+        # Clean white background guaranteed
+        self.setFillColor(colors.white)
+        self.rect(0, 0, letter[0], letter[1], fill=1, stroke=0)
+
+        # Elegant crisp institutional double border (standard VTU / academic project report format)
+        self.setStrokeColor(colors.HexColor('#1E293B')) # Dark Navy / Charcoal
+        self.setLineWidth(1.5)
+        self.rect(20, 20, letter[0] - 40, letter[1] - 40, fill=0, stroke=1)
+        
+        self.setLineWidth(0.6)
+        self.rect(23, 23, letter[0] - 46, letter[1] - 46, fill=0, stroke=1)
         self.restoreState()
 
 def generate_pdf(output_pdf):
     doc = SimpleDocTemplate(
         output_pdf,
         pagesize=letter,
-        leftMargin=36,
-        rightMargin=36,
+        leftMargin=38,
+        rightMargin=38,
         topMargin=36,
         bottomMargin=36
     )
@@ -57,14 +62,14 @@ def generate_pdf(output_pdf):
     t_center_reg_11  = ParagraphStyle('T11Reg', fontName='Times-Roman', fontSize=10.5, leading=14, alignment=1, textColor=colors.black)
     t_center_bold_11 = ParagraphStyle('T11Bold', fontName='Times-Bold', fontSize=10.5, leading=14, alignment=1, textColor=colors.black)
 
-    sec_title = ParagraphStyle('SecTitle', fontName='Times-Bold', fontSize=14, leading=18, alignment=1, textColor=colors.black, spaceBefore=8, spaceAfter=8)
-    sub_title = ParagraphStyle('SubTitle', fontName='Times-Bold', fontSize=11, leading=15, textColor=colors.black, spaceBefore=6, spaceAfter=3)
+    sec_title = ParagraphStyle('SecTitle', fontName='Times-Bold', fontSize=13, leading=17, alignment=1, textColor=colors.black, spaceBefore=4, spaceAfter=6)
+    sub_title = ParagraphStyle('SubTitle', fontName='Times-Bold', fontSize=10.5, leading=14, textColor=colors.black, spaceBefore=5, spaceAfter=2)
 
-    body = ParagraphStyle('BodyTextTimes', fontName='Times-Roman', fontSize=9.5, leading=13.5, textColor=colors.black, spaceAfter=4)
-    body_justify = ParagraphStyle('BodyJustify', fontName='Times-Roman', fontSize=9.5, leading=13.5, alignment=4, textColor=colors.black, spaceAfter=5)
+    body = ParagraphStyle('BodyTextTimes', fontName='Times-Roman', fontSize=9, leading=13, textColor=colors.black, spaceAfter=3)
+    body_justify = ParagraphStyle('BodyJustify', fontName='Times-Roman', fontSize=9, leading=13, alignment=4, textColor=colors.black, spaceAfter=4)
     callout_style = ParagraphStyle('CalloutTimes', fontName='Times-Italic', fontSize=8.5, leading=12, alignment=1, textColor=colors.HexColor('#27272A'), spaceAfter=4)
-    bullet = ParagraphStyle('BulletTimes', parent=body_justify, leftIndent=16, firstLineIndent=-10, spaceAfter=3)
-    pnum_style = ParagraphStyle('PageNum', fontName='Times-Roman', fontSize=10, alignment=2, textColor=colors.black)
+    bullet = ParagraphStyle('BulletTimes', parent=body_justify, leftIndent=16, firstLineIndent=-10, spaceAfter=2.5)
+    pnum_style = ParagraphStyle('PageNum', fontName='Times-Roman', fontSize=9.5, alignment=2, textColor=colors.black)
 
     table_cell = ParagraphStyle('TCell', fontName='Times-Roman', fontSize=8.5, leading=11, textColor=colors.black)
     table_cell_bold = ParagraphStyle('TCellB', fontName='Times-Bold', fontSize=8.5, leading=11, textColor=colors.black)
@@ -75,7 +80,7 @@ def generate_pdf(output_pdf):
     # =========================================================================
     # PAGE 1: TITLE / COVER PAGE (EXACT VVCE FORMAT)
     # =========================================================================
-    story.append(Spacer(1, 10))
+    story.append(Spacer(1, 12))
     story.append(Paragraph("VIDYAVARDHAKA COLLEGE OF ENGINEERING", t_center_bold_16))
     story.append(Paragraph("(Autonomous, affiliated to VTU)", t_center_reg_11))
     story.append(Spacer(1, 8))
@@ -94,7 +99,7 @@ def generate_pdf(output_pdf):
     story.append(Spacer(1, 8))
     story.append(Paragraph("Submitted in partial fulfillment of the requirement for the completion of VII semester of", t_center_reg_11))
     story.append(Paragraph("BACHELOR OF ENGINEERING", t_center_bold_12))
-    story.append(Spacer(1, 12))
+    story.append(Spacer(1, 16))
 
     # Two column table: Submitted by & Under guidance of
     sub_guide_table = Table([
@@ -126,7 +131,7 @@ def generate_pdf(output_pdf):
     # =========================================================================
     # PAGE 2: ABSTRACT & TABLE OF CONTENTS
     # =========================================================================
-    story.append(Spacer(1, 8))
+    story.append(Spacer(1, 6))
     story.append(Paragraph("ABSTRACT", sec_title))
     story.append(Paragraph(
         "Road traffic collisions constitute a critical public safety crisis and cause severe economic loss worldwide. "
@@ -138,7 +143,7 @@ def generate_pdf(output_pdf):
         "The findings are visualized through a high-performance <b>React 18 + Leaflet GIS</b> interactive web platform deployed on Vercel.",
         body_justify
     ))
-    story.append(Spacer(1, 16))
+    story.append(Spacer(1, 14))
 
     story.append(Paragraph("Table of Contents", sec_title))
     dots = " . " * 28
@@ -174,7 +179,7 @@ def generate_pdf(output_pdf):
     story.append(Paragraph("• To execute parallelized MapReduce and PySpark jobs for spatio-temporal clustering and rush hour pattern discovery.", bullet))
     story.append(Paragraph("• To calculate the Accident Severity Index (ASI) and classify road corridors into Critical, High, Moderate, and Low risk levels.", bullet))
     story.append(Paragraph("• To build an interactive full-stack GIS web application (React + FastAPI) deployed in production for municipal decision support.", bullet))
-    story.append(Spacer(1, 4))
+    story.append(Spacer(1, 3))
 
     story.append(Paragraph("2. METHODOLOGY", sec_title))
     story.append(Paragraph("<b>Overview:</b> This project employs a distributed Big Data analytics methodology following the canonical Big Data pipeline: <b>Data Ingestion → Distributed Preprocessing → Parallel Computation → Risk Modeling → GIS Interactive Presentation</b>.", body_justify))
@@ -185,7 +190,7 @@ def generate_pdf(output_pdf):
     story.append(Paragraph("• <b>Service Tier:</b> FastAPI (Python 3.11 asynchronous REST API with 19 analytics endpoints).", bullet))
     story.append(Paragraph("• <b>Presentation Tier:</b> React 18, Leaflet GIS, Lucide icons, and Tailwind CSS deployed on Vercel Multi-Services.", bullet))
     story.append(Paragraph("<b>Modeling Approach:</b> Since accident severity is multi-tiered (1 = Minor to 4 = Fatal), we compute an empirical <b>Accident Severity Index (ASI)</b>: <i>Risk Score = (5 × S4) + (3 × S3) + (1.5 × S2) + (1 × S1)</i>. Road intersections scoring ≥ 100 with density index ≥ 8.0 are flagged as priority Black Spots.", body_justify))
-    story.append(Spacer(1, 4))
+    story.append(Spacer(1, 3))
     story.append(Paragraph("1", pnum_style))
     story.append(PageBreak())
 
@@ -199,7 +204,7 @@ def generate_pdf(output_pdf):
     story.append(Paragraph("• <b>Total Attributes:</b> 22 core attributes (18 predictive covariates, 3 spatial coordinates, 1 target severity).", bullet))
     story.append(Paragraph("• <b>Target Variable:</b> <i>Severity</i> (Integer scale 1 to 4: 1 = Minor property damage, 4 = Fatal collision).", bullet))
     story.append(Paragraph("• <b>Temporal Span:</b> 2016-01-01 to 2022-12-30 (continuous multi-year span).", bullet))
-    story.append(Spacer(1, 4))
+    story.append(Spacer(1, 3))
 
     story.append(Paragraph("<b>Dataset Attributes Specification:</b>", sub_title))
     ds_table_data = [
@@ -225,9 +230,9 @@ def generate_pdf(output_pdf):
         ('BOTTOMPADDING', (0,0), (-1,-1), 2),
     ]))
     story.append(ds_table)
-    story.append(Spacer(1, 6))
-    story.append(Paragraph("<b>Key Feature Categories:</b> Categorized into (1) Metadata (ID, Source), (2) Spatial Coordinates (Lat/Lng geohash micro-grids), (3) Temporal (Hour of day, Day of week, Month), (4) Weather Conditions (Precipitation, Temperature, Wind Chill, Fog), and (5) Roadway Infrastructure (Traffic Signal, Junction, Crossing, Stop Sign).", body_justify))
     story.append(Spacer(1, 4))
+    story.append(Paragraph("<b>Key Feature Categories:</b> Categorized into (1) Metadata (ID, Source), (2) Spatial Coordinates (Lat/Lng geohash micro-grids), (3) Temporal (Hour of day, Day of week, Month), (4) Weather Conditions (Precipitation, Temperature, Wind Chill, Fog), and (5) Roadway Infrastructure (Traffic Signal, Junction, Crossing, Stop Sign).", body_justify))
+    story.append(Spacer(1, 3))
     story.append(Paragraph("2", pnum_style))
     story.append(PageBreak())
 
@@ -242,9 +247,8 @@ def generate_pdf(output_pdf):
     story.append(Paragraph("• <b>Meta/Excluded:</b> Textual descriptions and internal tracking hashes were excluded to reduce I/O overhead.", bullet))
     story.append(Paragraph("<b>Data Cleansing in Apache Pig (`clean_accidents.pig`):</b>", sub_title))
     story.append(Paragraph("A dedicated Apache Pig Latin script processes raw records from `/accident_data/raw/` in HDFS: (1) Filters out tuples with null latitude/longitude, (2) Enforces bounding box constraints (Lat: 24°N to 50°N, Lng: -125°W to -66°W), (3) Standardizes date strings into discrete `Hour`, `Day`, `Month`, and `Year` integer tokens, and (4) Imputes missing ambient temperature values with regional monthly medians.", bullet))
-    story.append(Spacer(1, 4))
+    story.append(Spacer(1, 3))
 
-    # Architecture diagram or table
     prep_table_data = [
         [Paragraph("<b>Step</b>", table_head), Paragraph("<b>Operation</b>", table_head), Paragraph("<b>Hadoop / Tool Implementation</b>", table_head), Paragraph("<b>Records Handled</b>", table_head)],
         [Paragraph("1. Ingestion", table_cell), Paragraph("Stream raw CSV to HDFS", table_cell), Paragraph("`hdfs dfs -put /datasets/raw/ /data/`", table_cell), Paragraph("50,000 records", table_cell)],
@@ -257,14 +261,14 @@ def generate_pdf(output_pdf):
         ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#71717A')),
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#F4F4F5')),
         ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-        ('TOPPADDING', (0,0), (-1,-1), 2.5),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 2.5),
+        ('TOPPADDING', (0,0), (-1,-1), 2),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 2),
     ]))
     story.append(prep_table)
-    story.append(Spacer(1, 6))
+    story.append(Spacer(1, 4))
 
     story.append(Paragraph("<b>Data Partitioning & Train/Test Splits:</b> For machine learning and analytical modeling, clean records are partitioned into an 80% training set (40,000 instances) and a 20% validation set (10,000 instances) using Spark's `randomSplit([0.8, 0.2], seed=42)`. This ensures risk classification thresholds generalize across unseen real-world traffic data.", body_justify))
-    story.append(Spacer(1, 4))
+    story.append(Spacer(1, 3))
     story.append(Paragraph("3", pnum_style))
     story.append(PageBreak())
 
@@ -279,23 +283,22 @@ def generate_pdf(output_pdf):
     story.append(Paragraph("This model maps geographic coordinate tuples into discrete spatial buckets and computes cumulative crash counts and injury severities. "
                            "<b>Strengths:</b> Scales linearly across arbitrary cluster sizes; NameNode balances tasks across DataNodes with zero memory overhead. "
                            "<b>Operation:</b> Mapper emits `(Geohash_Grid, (1, Severity))` and Reducer aggregates total crashes, identifying junctions with abnormal crash volumes.", body_justify))
-    story.append(Spacer(1, 3))
+    story.append(Spacer(1, 2))
 
     story.append(Paragraph("<b>2. Spatio-Temporal Clustering (Accident Severity Index - ASI)</b>", sub_title))
     story.append(Paragraph("Rather than treating all accidents equally, the ASI model computes a weighted severity index: "
                            "<i>ASI = (5 × S4) + (3 × S3) + (1.5 × S2) + (1 × S1)</i>. "
                            "<b>Strengths:</b> Differentiates between benign bumper collisions and lethal multi-vehicle pileups. "
                            "A density index (1.0 to 10.0 scale) is assigned to each identified cluster, providing civic planners with objective risk rankings.", body_justify))
-    story.append(Spacer(1, 3))
+    story.append(Spacer(1, 2))
 
     story.append(Paragraph("<b>3. Multivariate Correlation & In-Memory Spark Aggregation</b>", sub_title))
     story.append(Paragraph("PySpark DataFrames execute in-memory DAG transformations to analyze crash correlations against external covariates: "
                            "(1) <i>Temporal Spikes:</i> Morning peak (7:30–9:30 AM) and evening peak (5:00–7:00 PM) account for 41.2% of all accidents. "
                            "(2) <i>Meteorological Hazards:</i> Freezing rain and heavy snow elevate multi-vehicle collision probability by 3.4x. "
                            "(3) <i>Road Structure:</i> Roundabouts and highway off-ramps display the highest concentration of severe impact angles.", body_justify))
-    story.append(Spacer(1, 4))
+    story.append(Spacer(1, 3))
 
-    # Analytical Models comparison table
     models_table = Table([
         [Paragraph("<b>Model / Task</b>", table_head), Paragraph("<b>Algorithm / Formula</b>", table_head), Paragraph("<b>Primary Strength</b>", table_head), Paragraph("<b>Key Finding</b>", table_head)],
         [Paragraph("Spatial MapReduce", table_cell), Paragraph("Key-Value Geohash Aggregation", table_cell), Paragraph("Fault-tolerant linear scalability", table_cell), Paragraph("Isolated 2,485 discrete crash clusters", table_cell)],
@@ -310,7 +313,7 @@ def generate_pdf(output_pdf):
         ('BOTTOMPADDING', (0,0), (-1,-1), 2),
     ]))
     story.append(models_table)
-    story.append(Spacer(1, 4))
+    story.append(Spacer(1, 3))
     story.append(Paragraph("4", pnum_style))
     story.append(PageBreak())
 
@@ -324,17 +327,16 @@ def generate_pdf(output_pdf):
     story.append(Paragraph("<b>3. Warehouse Structuring:</b> Apache Hive creates external partitioned ORC tables (`create_tables.hql`) backed by Snappy compression for structured ad-hoc SQL querying.", bullet))
     story.append(Paragraph("<b>4. Distributed Analytics:</b> PySpark jobs (`time_patterns.py`, `location_stats.py`, `weather_analysis.py`) execute in-memory RDD/DataFrame aggregations in parallel across cluster worker nodes.", bullet))
     story.append(Paragraph("<b>5. Prediction & Evaluation:</b> The aggregated black spot coordinates and ASI risk scores flow into the FastAPI REST service and the React Leaflet GIS visualizer for real-time corridor risk inspection.", bullet))
-    story.append(Spacer(1, 4))
+    story.append(Spacer(1, 3))
 
-    # Embed Pipeline Screenshot or Architecture Visual
     img_pipeline = "/Users/likhithmr/.gemini/antigravity/brain/47ddebf7-3c4b-4514-a371-cc9563ce61f0/shot_rendered.png"
     if os.path.exists(img_pipeline):
         story.append(Paragraph("<b>Figure 1:</b> Distributed Big Data Analytics Pipeline & Spatial Hotspot Engine", sub_title))
-        story.append(Image(img_pipeline, width=6.6*inch, height=2.4*inch))
-        story.append(Spacer(1, 3))
+        story.append(Image(img_pipeline, width=6.5*inch, height=2.3*inch))
+        story.append(Spacer(1, 2))
         story.append(Paragraph("<i>Pipeline Architecture: Raw data in HDFS is cleaned via Pig Latin, aggregated via PySpark, and exposed through FastAPI REST endpoints to the React Leaflet GIS frontend.</i>", callout_style))
 
-    story.append(Spacer(1, 4))
+    story.append(Spacer(1, 3))
     story.append(Paragraph("5", pnum_style))
     story.append(PageBreak())
 
@@ -347,17 +349,16 @@ def generate_pdf(output_pdf):
     story.append(Paragraph("The models were evaluated using crash classification accuracy, execution runtime, and geographical precision:", body_justify))
     story.append(Paragraph("• <b>Simple Frequency Count:</b> Showed high false-positive error rates by flagging high-volume downtown tollbooths where injuries are negligible (pure property damage).", bullet))
     story.append(Paragraph("• <b>Accident Severity Index (ASI):</b> Successfully suppressed low-severity congestion areas and correctly elevated high-speed suburban highway intersections where fatal crash rates are 4x higher.", bullet))
-    story.append(Spacer(1, 4))
+    story.append(Spacer(1, 3))
 
-    # Embed Figure 2: Live GIS Heatmap Screenshot
     img_gis = "/Users/likhithmr/.gemini/antigravity/brain/47ddebf7-3c4b-4514-a371-cc9563ce61f0/gis_clean_verified.png"
     if os.path.exists(img_gis):
         story.append(Paragraph("<b>Figure 2:</b> Geospatial Black Spot Identification & Risk Heatmap (Houston Metropolitan Area)", sub_title))
-        story.append(Image(img_gis, width=6.6*inch, height=2.6*inch))
-        story.append(Spacer(1, 3))
+        story.append(Image(img_gis, width=6.5*inch, height=2.5*inch))
+        story.append(Spacer(1, 2))
         story.append(Paragraph("<i>Discussion: Over 2,485 accident hotspots were detected. The highest-risk corridor (469 Broadway, Houston, Risk Score: 110) exhibits high-intensity red thermal gradients, validating targeted police deployment needs.</i>", callout_style))
 
-    story.append(Spacer(1, 4))
+    story.append(Spacer(1, 3))
     story.append(Paragraph("6", pnum_style))
     story.append(PageBreak())
 
@@ -366,22 +367,21 @@ def generate_pdf(output_pdf):
     # =========================================================================
     story.append(Paragraph("7. RESULTS AND DISCUSSION (CONTINUED)", sec_title))
     story.append(Paragraph("<b>Empirical Geospatial and Night-Mode Telemetry:</b> Modern municipal command rooms operate in low-light environments requiring high-contrast visual ergonomics. The deployed platform features a dark-mode GIS tile layer with instant corridor risk inspection:", body_justify))
-    story.append(Spacer(1, 4))
+    story.append(Spacer(1, 3))
 
-    # Embed Figure 3: Dark Mode Screenshot
     img_dark = "/Users/likhithmr/.gemini/antigravity/brain/47ddebf7-3c4b-4514-a371-cc9563ce61f0/gis_dark_matter_verified.png"
     if os.path.exists(img_dark):
         story.append(Paragraph("<b>Figure 3:</b> High-Contrast Night-Mode GIS Command Center with Hazard Telemetry", sub_title))
-        story.append(Image(img_dark, width=6.6*inch, height=2.5*inch))
-        story.append(Spacer(1, 3))
+        story.append(Image(img_dark, width=6.5*inch, height=2.4*inch))
+        story.append(Spacer(1, 2))
         story.append(Paragraph("<i>Discussion: The right-hand telemetry sidebar summarizes top hazardous intersections, primary road surface defects, and seasonal accident variations in real time.</i>", callout_style))
-    story.append(Spacer(1, 6))
+    story.append(Spacer(1, 4))
 
     story.append(Paragraph("<b>Interpretation of Empirical Findings:</b><br/>"
                            "1. <b>Temporal Rush Hour Correlation:</b> Weekday crash rates spike sharply between 7:00–9:00 AM and 5:00–7:00 PM, corroborating commuter density hypotheses.<br/>"
                            "2. <b>Precipitation Multiplier:</b> Inclement weather (blowing snow, freezing rain, wet asphalt) compounds crash probability by 3.4x, reducing braking distances on high-speed corridors.<br/>"
                            "3. <b>Infrastructure Vulnerabilities:</b> Unsignalized highway merges account for 38% of all incapacitating severe crashes, providing actionable targets for civil engineering redesign.", body_justify))
-    story.append(Spacer(1, 4))
+    story.append(Spacer(1, 3))
     story.append(Paragraph("7", pnum_style))
     story.append(PageBreak())
 
@@ -393,30 +393,29 @@ def generate_pdf(output_pdf):
     story.append(Paragraph("<b>Limitations:</b>", sub_title))
     story.append(Paragraph("• <b>Batch vs. Stream Latency:</b> While MapReduce and Spark handle massive static datasets efficiently, real-time millisecond sensor streams require a streaming messaging layer like Apache Kafka.", bullet))
     story.append(Paragraph("• <b>External Exogenous Factors:</b> The dataset records vehicular and meteorological parameters but cannot measure driver behavioral anomalies (e.g., mobile phone distraction, DUI) which often trigger collisions.", bullet))
-    story.append(Spacer(1, 4))
+    story.append(Spacer(1, 3))
 
     story.append(Paragraph("<b>Future Work & Scope:</b> To improve the platform, we propose:", sub_title))
     story.append(Paragraph("• <b>Streaming Ingestion (Apache Kafka + Spark Structured Streaming):</b> Ingest live connected-vehicle telemetry and automated police CAD feeds with sub-second latency.", bullet))
     story.append(Paragraph("• <b>Deep Learning Predictive Forecasting:</b> Train Spatio-Temporal Graph Neural Networks (ST-GNNs) or XGBoost to predict crash probabilities 1 hour in advance using live weather radar feeds.", bullet))
     story.append(Paragraph("• <b>Autonomous Incident Management:</b> Connect directly to municipal Variable Speed Limit (VSL) roadside electronic boards to dynamically lower speed limits during adverse black spot weather.", bullet))
-    story.append(Spacer(1, 10))
+    story.append(Spacer(1, 8))
 
-    # Live links box
     live_box = Table([
         [Paragraph("<b>Official Repository & Production Deployment Links:</b><br/>"
                    "• <b>Live Production URL:</b> <a href='https://bda-accident-analytics.vercel.app'>https://bda-accident-analytics.vercel.app</a><br/>"
                    "• <b>GitHub Repository:</b> <a href='https://github.com/Taiyorath/BDA-activity-'>https://github.com/Taiyorath/BDA-activity-</a><br/>"
                    "• <b>Institutional Affiliation:</b> Vidyavardhaka College of Engineering (VVCE), Dept. of CSE, Mysuru", table_cell)]
-    ], colWidths=[480])
+    ], colWidths=[475])
     live_box.setStyle(TableStyle([
         ('BOX', (0,0), (-1,-1), 1, colors.HexColor('#D97757')),
         ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#FAFAFA')),
-        ('TOPPADDING', (0,0), (-1,-1), 6),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 6),
+        ('TOPPADDING', (0,0), (-1,-1), 5),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 5),
         ('LEFTPADDING', (0,0), (-1,-1), 8),
     ]))
     story.append(live_box)
-    story.append(Spacer(1, 4))
+    story.append(Spacer(1, 3))
     story.append(Paragraph("8", pnum_style))
 
     doc.build(story, canvasmaker=BorderCanvas)
